@@ -1,4 +1,5 @@
 import { Containable } from './Containable'
+import { ControlStrategy } from './ControlStrategy'
 import { Elevator, ElevatorStatus } from './Elevator'
 import { Floor } from './Floor'
 
@@ -30,42 +31,32 @@ export class Building {
       }
     }
 
-    throw new Error('目前不支援這項操作')
+    throw new TypeError(`${from}, ${to}`)
   }
 
-  public startMonitor() {
+  public startMonitor(controlStrategy: ControlStrategy) {
+    const isValidated = this.validate()
+    if (!isValidated) {
+      console.error('樓層數必須大於 1，電梯數必須大於 0')
+      return
+    }
+
     this.monitorTimer = setInterval(() => {
-      this.monitor()
+      for (let floor of this.floors) {
+        if (floor.doesPeopleWait()) {
+          const elevator = controlStrategy.selectElevator(floor, this.elevators)
+          if (!elevator) {
+            continue
+          }
+
+          const newStatus = this.getStatus(elevator.currentFloor, floor)
+          elevator.assignTask(newStatus, floor)
+        }
+      }
     }, this.monitorTimerPeriod)
   }
 
-  public monitor() {
-    for (let floor of this.floors) {
-      if (floor.doesPeopleWait()) {
-        const elevator = this.selectElevator(floor)
-        if (!elevator) {
-          continue
-        }
-
-        // TODO: 1F 電梯往 3F 時，5F 有人按電梯，電梯目標應改為 5F，原 3F 成為中途站
-        const newStatus = this.getStatus(elevator.currentFloor, floor)
-        elevator.assignTask(newStatus, floor)
-      }
-    }
-  }
-
-  public selectElevator(destinationFloor: Floor): Elevator | null {
-    for (let elevator of this.elevators) {
-      // Is any elevator go to there
-      if (elevator.destinationFloor == destinationFloor) return null
-
-      // Idle one comes first
-      if (elevator.status == ElevatorStatus.Idle) {
-        return elevator
-      }
-      // Then the same direction one
-      // if (elevator.status == ElevatorStatus.Up)
-    }
-    return null
+  public validate(): boolean {
+    return this.floors.length > 1 && this.elevators.length > 0
   }
 }
