@@ -44,10 +44,10 @@ export class Building {
       if (floor.doesPeopleWait()) {
         const elevator = this.selectElevator(floor)
         if (!elevator) {
-          console.log('電梯工作中，請稍等')
           continue
         }
 
+        // TODO: 1F 電梯往 3F 時，5F 有人按電梯，電梯目標應改為 5F，原 3F 成為中途站
         const newStatus = this.getStatus(elevator.currentFloor, floor)
         elevator.assignTask(newStatus, floor)
       }

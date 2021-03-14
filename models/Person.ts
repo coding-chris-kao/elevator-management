@@ -5,7 +5,7 @@ export class Person {
   constructor(
     public id: number,
     public currentContainer: Containable,
-    public destinationContainer: Containable
+    public destinationContainer: Floor
   ) {
     if (
       currentContainer instanceof Floor &&
@@ -19,5 +19,9 @@ export class Person {
 
   public get name(): string {
     return `人物#${this.id}`
+  }
+
+  public callElevator() {
+    this.currentContainer.addPeople([this])
   }
 }

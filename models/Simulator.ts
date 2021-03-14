@@ -41,14 +41,15 @@ export class Simulator {
   }
 
   public createPerson(id: number, building: Building): Person {
-    let from = Math.floor(Math.random() * this.floorCount)
-    let to
-    do {
-      to = Math.floor(Math.random() * this.floorCount)
-    } while (to == from)
-
+    // let from = Math.floor(Math.random() * this.floorCount)
+    // let to
+    // do {
+    //   to = Math.floor(Math.random() * this.floorCount)
+    // } while (to == from)
+    let from = 5
+    let to = 3
     const person = new Person(1, building.floors[from], building.floors[to])
-    building.floors[from].addPeople([person])
+    person.callElevator()
 
     return person
   }

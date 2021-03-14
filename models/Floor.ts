@@ -16,10 +16,11 @@ export class Floor implements Containable {
     this.people.push(...people)
     people.forEach((person) => {
       person.currentContainer = this
+      console.log(`${person.name} 進入 ${this.name}`)
     })
   }
 
-  public removePeople(limit: number, elevatorStatus: ElevatorStatus): Person[] {
+  public takePeople(limit: number, elevatorStatus: ElevatorStatus): Person[] {
     const people: Person[] = []
     for (let i = 0; i < this.people.length; i++) {
       if (people.length == limit) break
@@ -31,6 +32,7 @@ export class Floor implements Containable {
       )
       if (personStatus == elevatorStatus) {
         people.push(...this.people.splice(i, 1))
+        console.log(`${person.name} 離開 ${this.name}`)
       }
     }
     return people
