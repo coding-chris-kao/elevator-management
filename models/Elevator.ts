@@ -43,7 +43,7 @@ export class Elevator implements Containable {
 
   public travel(): void {
     this.travelTimer = setInterval(() => {
-      this.handleArrivceStopFloor()
+      this.handleArriveStopFloor()
     }, this.travelTime)
   }
 
@@ -68,24 +68,36 @@ export class Elevator implements Containable {
     }
   }
 
-  public handleArrivceStopFloor() {
+  public handleArriveStopFloor() {
+    this.letPeopleIn()
+
+    const index = this.building.floors.indexOf(this.currentFloor)
+    // Handle the edge case
+    if (index == this.building.floors.length - 1) {
+      this.status = ElevatorStatus.Down
+      this.currentFloor = this.building.floors[index - 1]
+    } else if (index == 0) {
+      this.status = ElevatorStatus.Up
+      this.currentFloor = this.building.floors[1]
+    }
+
+    // Handle the normal case
     if (this.status == ElevatorStatus.Up) {
-      const index = this.building.floors.indexOf(this.currentFloor)
       this.currentFloor = this.building.floors[index + 1]
     } else if (this.status == ElevatorStatus.Down) {
-      const index = this.building.floors.indexOf(this.currentFloor)
       this.currentFloor = this.building.floors[index - 1]
     }
 
     if (this.currentFloor === this.destinationFloor) {
       this.handleArriveDestination()
     } else {
+      console.log(`${this.name} 來到 ${this.currentFloor.name} 了`)
+
       this.letPeopleOut()
       this.letPeopleIn()
       if (this.people.length > 0) {
         this.changeDestinationFloor()
       }
-      console.log(`${this.name} 來到 ${this.currentFloor.name} 了`)
     }
   }
 
