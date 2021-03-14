@@ -21,7 +21,9 @@ export class Person {
     return `人物#${this.id}`
   }
 
-  public callElevator() {
-    this.currentContainer.addPeople([this])
+  public callElevator(delay: number) {
+    setTimeout(() => {
+      this.currentContainer.addPeople([this])
+    }, delay)
   }
 }
