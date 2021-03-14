@@ -36,39 +36,24 @@ export class Elevator implements Containable {
       this.travel()
     }
 
-    console.log(`${this.name} 出發前往 ${destinationFloor.name}`)
+    console.log(
+      `${this.name} 從 ${this.currentFloor.name} 出發前往 ${destinationFloor.name}`
+    )
   }
 
   public travel(): void {
     this.travelTimer = setInterval(() => {
-      if (this.currentFloor === this.destinationFloor) {
-        console.log(`${this.name} 抵達 ${this.destinationFloor.name} 了`)
-        this.exchangePeople()
-
-        if (this.people.length > 0) {
-          this.changeDestinationFloor()
-        } else {
-          this.setElevatorToIdle()
-        }
-        return
-      }
-
-      if (this.status == ElevatorStatus.Up) {
-        const index = this.building.floors.indexOf(this.currentFloor)
-        this.currentFloor = this.building.floors[index + 1]
-      } else if (this.status == ElevatorStatus.Down) {
-        const index = this.building.floors.indexOf(this.currentFloor)
-        this.currentFloor = this.building.floors[index - 1]
-      }
+      this.handleArrivceStopFloor()
     }, this.travelTime)
   }
 
-  public exchangePeople(): void {
-    this.letPeopleOut()
+  public handleArriveDestination() {
+    console.log(`${this.name} 抵達 ${this.destinationFloor!.name} 了`)
 
+    this.letPeopleOut()
     this.letPeopleIn()
 
-    // Turn over
+    // Turn over and take people to the other way
     if (this.people.length == 0) {
       if (this.status == ElevatorStatus.Up) this.status = ElevatorStatus.Down
       else if (this.status == ElevatorStatus.Down)
@@ -76,9 +61,31 @@ export class Elevator implements Containable {
       this.letPeopleIn()
     }
 
-    // Nobody come in, elevator become idle
-    if (this.people.length == 0) {
+    if (this.people.length > 0) {
+      this.changeDestinationFloor()
+    } else {
       this.setElevatorToIdle()
+    }
+  }
+
+  public handleArrivceStopFloor() {
+    if (this.status == ElevatorStatus.Up) {
+      const index = this.building.floors.indexOf(this.currentFloor)
+      this.currentFloor = this.building.floors[index + 1]
+    } else if (this.status == ElevatorStatus.Down) {
+      const index = this.building.floors.indexOf(this.currentFloor)
+      this.currentFloor = this.building.floors[index - 1]
+    }
+
+    if (this.currentFloor === this.destinationFloor) {
+      this.handleArriveDestination()
+    } else {
+      this.letPeopleOut()
+      this.letPeopleIn()
+      if (this.people.length > 0) {
+        this.changeDestinationFloor()
+      }
+      console.log(`${this.name} 來到 ${this.currentFloor.name} 了`)
     }
   }
 
