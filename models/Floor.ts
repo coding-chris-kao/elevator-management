@@ -30,7 +30,10 @@ export class Floor implements Containable {
         person.currentContainer,
         person.destinationContainer
       )
-      if (personStatus == elevatorStatus) {
+      if (
+        personStatus == elevatorStatus ||
+        elevatorStatus == ElevatorStatus.Idle
+      ) {
         people.push(...this.people.splice(i, 1))
         console.log(`${person.name} 離開 ${this.name}`)
       }

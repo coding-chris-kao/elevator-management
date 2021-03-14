@@ -2,6 +2,7 @@ import { Building } from './Building'
 import { Containable } from './Containable'
 import { Floor } from './Floor'
 import { Person } from './Person'
+import { sleep } from './sleep'
 
 export enum ElevatorStatus {
   Up,
@@ -50,15 +51,15 @@ export class Elevator implements Containable {
   public handleArriveDestination() {
     console.log(`${this.name} 抵達 ${this.destinationFloor!.name} 了`)
 
-    this.letPeopleOut()
-    this.letPeopleIn()
+    this.exchangePeople()
 
     // Turn over and take people to the other way
     if (this.people.length == 0) {
       if (this.status == ElevatorStatus.Up) this.status = ElevatorStatus.Down
       else if (this.status == ElevatorStatus.Down)
         this.status = ElevatorStatus.Up
-      this.letPeopleIn()
+
+      this.exchangePeople()
     }
 
     if (this.people.length > 0) {
@@ -69,36 +70,48 @@ export class Elevator implements Containable {
   }
 
   public handleArriveStopFloor() {
-    this.letPeopleIn()
-
-    const index = this.building.floors.indexOf(this.currentFloor)
-    // Handle the edge case
-    if (index == this.building.floors.length - 1) {
-      this.status = ElevatorStatus.Down
-      this.currentFloor = this.building.floors[index - 1]
-    } else if (index == 0) {
-      this.status = ElevatorStatus.Up
-      this.currentFloor = this.building.floors[1]
-    }
-
-    // Handle the normal case
-    if (this.status == ElevatorStatus.Up) {
-      this.currentFloor = this.building.floors[index + 1]
-    } else if (this.status == ElevatorStatus.Down) {
-      this.currentFloor = this.building.floors[index - 1]
-    }
-
     if (this.currentFloor === this.destinationFloor) {
       this.handleArriveDestination()
     } else {
+      const index = this.building.floors.indexOf(this.currentFloor)
+
+      // Handle the edge case
+      if (index == this.building.floors.length - 1) {
+        this.status = ElevatorStatus.Down
+        this.currentFloor = this.building.floors[index - 1]
+      } else if (index == 0) {
+        this.status = ElevatorStatus.Up
+        this.currentFloor = this.building.floors[1]
+      }
+
+      // Handle the normal case
+      if (this.status == ElevatorStatus.Up) {
+        this.currentFloor = this.building.floors[index + 1]
+      } else if (this.status == ElevatorStatus.Down) {
+        this.currentFloor = this.building.floors[index - 1]
+      }
+
       console.log(`${this.name} 來到 ${this.currentFloor.name} 了`)
 
-      this.letPeopleOut()
-      this.letPeopleIn()
-      if (this.people.length > 0) {
-        this.changeDestinationFloor()
+      if (
+        (this.status == ElevatorStatus.Up &&
+          this.currentFloor.doesPeopleGoUp()) ||
+        (this.status == ElevatorStatus.Down &&
+          this.currentFloor.doesPeopleGoDown()) ||
+        this.status == ElevatorStatus.Idle
+      ) {
+        this.exchangePeople()
+        if (this.people.length > 0) {
+          this.changeDestinationFloor()
+        }
       }
     }
+  }
+
+  public exchangePeople() {
+    sleep(this.exchangeTime)
+    this.letPeopleOut()
+    this.letPeopleIn()
   }
 
   public letPeopleOut() {
@@ -107,17 +120,9 @@ export class Elevator implements Containable {
   }
 
   public letPeopleIn() {
-    if (
-      (this.status == ElevatorStatus.Up &&
-        this.currentFloor.doesPeopleGoUp()) ||
-      (this.status == ElevatorStatus.Down &&
-        this.currentFloor.doesPeopleGoDown()) ||
-      this.status == ElevatorStatus.Idle
-    ) {
-      const peopleLimit = this.limit - this.people.length
-      const people = this.currentFloor.takePeople(peopleLimit, this.status)
-      this.addPeople(people)
-    }
+    const peopleLimit = this.limit - this.people.length
+    const people = this.currentFloor.takePeople(peopleLimit, this.status)
+    this.addPeople(people)
   }
 
   public addPeople(people: Person[]) {

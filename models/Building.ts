@@ -68,7 +68,7 @@ export class Building {
         clearInterval(this.monitorTimer!)
         this.monitorTimer = null
         console.warn(
-          `模擬結束，花費時間： ${Math.round(elapsedTime / 1000)} 秒`
+          `模擬結束，花費時間： ${Math.round((elapsedTime - 1000) / 1000)} 秒` // delay for one travelTime when the first elevator starts
         )
       }
     }, this.monitorTimerPeriod)
