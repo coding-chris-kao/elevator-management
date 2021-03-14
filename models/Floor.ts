@@ -65,6 +65,9 @@ export class Floor implements Containable {
   }
 
   public doesPeopleWait(): boolean {
-    return this.people.length > 0
+    const waitingPeople = this.people.filter(
+      (person) => person.currentContainer != person.destinationContainer
+    )
+    return waitingPeople.length > 0
   }
 }
