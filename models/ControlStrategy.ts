@@ -26,12 +26,20 @@ export class EfficentControlStrategy extends ControlStrategy {
   }
 }
 
-export class EnergySafeControlStrategy extends ControlStrategy {
+export class EnergySaveControlStrategy extends ControlStrategy {
   public selectElevator(
     destinationFloor: Floor,
     elevators: Elevator[]
   ): Elevator | null {
-    for (let elevator of elevators) {
+    let workableElevators = [elevators[0]]
+    for (let elevator of workableElevators) {
+      // Is any elevator go to there
+      if (elevator.destinationFloor == destinationFloor) return null
+
+      // Idle one comes first
+      if (elevator.status == ElevatorStatus.Idle) {
+        return elevator
+      }
     }
     return null
   }

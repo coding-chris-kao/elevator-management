@@ -6,9 +6,9 @@ import { Person } from './Person'
 
 export class Simulator {
   public simulationPeriod = 1000
-  public totlePeople = 3
+  public totlePeople = 40
   public floorCount: number = 10
-  public elevatorCount: number = 1
+  public elevatorCount: number = 2
   public elevatorLimit: number = 5
   public elevatorTravelTime: number = 1000
   public elevatorExchangeTime: number = 1000
