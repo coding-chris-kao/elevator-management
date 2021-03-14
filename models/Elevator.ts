@@ -134,6 +134,7 @@ export class Elevator implements Containable {
       const person = this.people[i]
       if (person.destinationContainer == this.currentFloor) {
         people.push(...this.people.splice(i, 1))
+        this.building.addServicedCount()
         console.log(`${person.name} 離開 ${this.name}`)
       }
     }

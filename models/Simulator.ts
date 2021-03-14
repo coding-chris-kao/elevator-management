@@ -6,7 +6,7 @@ import { Person } from './Person'
 
 export class Simulator {
   public simulationPeriod = 1000
-  public totlePeople = 40
+  public totlePeople = 3
   public floorCount: number = 10
   public elevatorCount: number = 1
   public elevatorLimit: number = 5
@@ -16,7 +16,7 @@ export class Simulator {
 
   public start() {
     // Create building
-    const building = new Building()
+    const building = new Building(this.totlePeople)
 
     // Create floors
     for (let i = 0; i < this.floorCount; i++) {
@@ -39,15 +39,13 @@ export class Simulator {
 
     // Create person and run the simulation
     let personId = 1
-    const startTime = Date.now()
+
     const simulationTimer = setInterval(() => {
       const person = this.createPerson(personId, building)
       person.callElevator(this.callElevatorDelay)
       personId++
       if (personId > this.totlePeople) {
         clearInterval(simulationTimer)
-        let elapsedTime = Date.now() - startTime
-        console.info(`模擬結束，花費時間： ${elapsedTime} millisecond`)
       }
     }, this.simulationPeriod)
 

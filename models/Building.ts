@@ -7,7 +7,10 @@ export class Building {
   public floors: Floor[] = []
   public elevators: Elevator[] = []
   public monitorTimer: NodeJS.Timeout | null = null
-  public monitorTimerPeriod: number = 1000
+  public monitorTimerPeriod: number = 500
+  public servicedCount: number = 0
+
+  constructor(public targetServicedCount: number) {}
 
   public registerFloor(floor: Floor) {
     this.floors.push(floor)
@@ -34,12 +37,18 @@ export class Building {
     throw new TypeError(`${from}, ${to}`)
   }
 
+  public addServicedCount() {
+    this.servicedCount++
+  }
+
   public startMonitor(controlStrategy: ControlStrategy) {
     const isValidated = this.validate()
     if (!isValidated) {
       console.error('樓層數必須大於 1，電梯數必須大於 0')
       return
     }
+
+    const startTime = Date.now()
 
     this.monitorTimer = setInterval(() => {
       for (let floor of this.floors) {
@@ -52,6 +61,15 @@ export class Building {
           const newStatus = this.getStatus(elevator.currentFloor, floor)
           elevator.assignTask(newStatus, floor)
         }
+      }
+
+      const elapsedTime = Date.now() - startTime
+      if (this.servicedCount >= this.targetServicedCount) {
+        clearInterval(this.monitorTimer!)
+        this.monitorTimer = null
+        console.warn(
+          `模擬結束，花費時間： ${Math.round(elapsedTime / 1000)} 秒`
+        )
       }
     }, this.monitorTimerPeriod)
   }
