@@ -27,6 +27,12 @@
 
 ---
 
+■ UML:
+
+[Elevator Management](https://app.diagrams.net/#Hcoding-chris-kao%2Felevator-management%2Fmain%2FElevator%20Management)
+
+---
+
 ## Project setup
 
 ```shell
